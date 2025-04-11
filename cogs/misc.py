@@ -5,6 +5,7 @@ import random
 from datetime import datetime
 import pytz
 from utils.debug import debug_command
+import asyncio
 
 
 class HelpPaginator(ui.View):
