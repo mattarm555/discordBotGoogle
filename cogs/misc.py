@@ -153,6 +153,8 @@ class Misc(commands.Cog):
         community_embed = Embed(title="📊 Community Tools", color=discord.Color.orange())
         community_embed.add_field(name="/poll", value="Create a poll with emoji-based voting.", inline=False)
         community_embed.add_field(name="/event", value="Create an RSVP event for members.", inline=False)
+        community_embed.add_field(name="/welcommeconfig", value="Shows server's welcoming configuration.", inline=False)
+        community_embed.add_field(name="/setwelcome", value="Allows user to configure a welcoming system.", inline=False)
         community_embed.set_footer(text="Page 4/5")
         pages.append(community_embed)
 
