@@ -16,9 +16,10 @@ class JengGPT(commands.Cog):
         await interaction.response.defer(thinking=True)
 
         try:
+            print(f"📝 Prompt received: {prompt}")
             print("🔁 Sending prompt to:", OLLAMA_URL)
             response = requests.post(f"{OLLAMA_URL}/api/generate", json={
-                "model": "mistral",
+                "model": "llama2-uncensored",
                 "prompt": prompt,
                 "stream": False
             })
@@ -31,7 +32,7 @@ class JengGPT(commands.Cog):
 
             embed = Embed(
                 title="🧠 JengGPT",
-                description=answer.strip(),
+                description=f"**Prompt:** {prompt}\n\n{answer.strip()}",
                 color=discord.Color.dark_teal()
             )
             embed.set_footer(text="Powered by Mistral via Ollama")
@@ -44,7 +45,6 @@ class JengGPT(commands.Cog):
                 description=f"```\n{str(e)}\n```",
                 color=discord.Color.red()
             ))
-
 
 async def setup(bot):
     await bot.add_cog(JengGPT(bot))
