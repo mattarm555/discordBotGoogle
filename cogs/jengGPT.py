@@ -16,12 +16,17 @@ class JengGPT(commands.Cog):
         await interaction.response.defer(thinking=True)
 
         try:
+            print("Sending prompt to:", OLLAMA_URL)
             response = requests.post(f"{OLLAMA_URL}/api/generate", json={
-                "model": "mistral",   # Or "llama2" or whatever you're running
+                "model": "mistral",
                 "prompt": prompt,
                 "stream": False
             })
-            data = response.json()
+
+            print("Status Code:", response.status_code)
+            print("Raw Response:", response.text[:300])  # Only show first 300 chars
+
+            data = response.json()  # <-- this is what throws if response is empty or invalid
             answer = data.get("response", "No response received.")
 
             embed = Embed(
@@ -38,6 +43,7 @@ class JengGPT(commands.Cog):
                 description=f"```\n{str(e)}\n```",
                 color=discord.Color.red()
             ))
+
 
 async def setup(bot):
     await bot.add_cog(JengGPT(bot))
