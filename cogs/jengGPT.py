@@ -4,7 +4,7 @@ from discord import app_commands, Interaction, Embed
 import requests
 
 # ✅ Latest working localtunnel URL
-OLLAMA_URL = "https://pop-po-ugly-rpg.trycloudflare.com/"
+OLLAMA_URL = "http://192.168.10.241:11434"
 
 class JengGPT(commands.Cog):
     def __init__(self, bot):
