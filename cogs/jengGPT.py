@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 from discord import app_commands, Interaction, Embed
 import requests
-import base64
 import os
 from json.decoder import JSONDecodeError  # Add this import to catch JSON errors
 
@@ -82,44 +81,6 @@ class JengGPT(commands.Cog):
                 color=discord.Color.red()
             ))
 
-    @app_commands.command(name="draw", description="Generate an image from a text prompt.")
-    @app_commands.describe(prompt="What do you want to see drawn?")
-    async def draw(self, interaction: Interaction, prompt: str):
-        await interaction.response.defer(thinking=True)
-
-        try:
-            print(f"🎨 Drawing prompt: {prompt}")
-            response = requests.post(f"{SD_URL}/sdapi/v1/txt2img", json={
-                "prompt": prompt,
-                "steps": 25
-            }, timeout=30)
-
-            data = response.json()
-            image_base64 = data['images'][0]
-
-            # Decode and save the image
-            image_bytes = base64.b64decode(image_base64.split(",", 1)[1])
-            file_path = "generated_image.png"
-            with open(file_path, "wb") as f:
-                f.write(image_bytes)
-
-            # Send it to Discord
-            file = discord.File(file_path, filename="generated_image.png")
-            await interaction.followup.send(
-                content=f"🧠 Prompt: `{prompt}`",
-                file=file
-            )
-
-            # Clean up
-            os.remove(file_path)
-
-        except Exception as e:
-            print("❌ Image generation error:", e)
-            await interaction.followup.send(embed=Embed(
-                title="❌ Image Generation Failed",
-                description=f"```\n{str(e)}\n```",
-                color=discord.Color.red()
-            ))
 
 async def setup(bot):
     await bot.add_cog(JengGPT(bot))
