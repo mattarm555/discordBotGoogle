@@ -18,7 +18,7 @@ class JengGPT(commands.Cog):
     async def askjeng(self, interaction: Interaction, prompt: str, model: str = DEFAULT_MODEL):
         await interaction.response.defer(thinking=True)
 
-                try:
+        try:
             print(f"📝 Prompt: {prompt}")
             print(f"🤖 Model selected: {model}")
             print("🔁 Sending prompt to:", OLLAMA_URL)
@@ -27,7 +27,7 @@ class JengGPT(commands.Cog):
                 "model": model,
                 "prompt": prompt,
                 "stream": False
-            }, timeout=20)  # added timeout
+            }, timeout=20)
 
             print("📡 Status Code:", response.status_code)
             print("🧾 Raw Response:", response.text[:300])
@@ -67,7 +67,6 @@ class JengGPT(commands.Cog):
                 description=f"```\n{str(e)}\n```",
                 color=discord.Color.red()
             ))
-
 
 async def setup(bot):
     await bot.add_cog(JengGPT(bot))
