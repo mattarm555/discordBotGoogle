@@ -1,17 +1,19 @@
 import discord
 from discord.ext import commands
 from discord import app_commands, Interaction, Embed
+import aiohttp
 import requests
 from json.decoder import JSONDecodeError
 
 OLLAMA_URL = "https://breeding-lookup-performances-intro.trycloudflare.com"
 DEFAULT_MODEL = "mistral"
 
-# 🔍 Quick check to verify Ollama is up before deferring
-def is_ollama_online() -> bool:
+# 🔍 Async check to verify Ollama is up before deferring
+async def is_ollama_online() -> bool:
     try:
-        response = requests.get(f"{OLLAMA_URL}/api/tags", timeout=1)
-        return response.status_code == 200
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{OLLAMA_URL}/api/tags", timeout=2) as resp:
+                return resp.status == 200
     except Exception:
         return False
 
@@ -25,26 +27,21 @@ class JengGPT(commands.Cog):
         model="Which model to use (e.g., mistral, llama2, codellama, llama2-uncensored)"
     )
     async def askjeng(self, interaction: Interaction, prompt: str, model: str = DEFAULT_MODEL):
-        # 🔍 Check Ollama status BEFORE deferring
-        if not is_ollama_online():
-            if not interaction.response.is_done():
-                await interaction.response.send_message(embed=Embed(
-                    title="🛑 JengGPT is not available",
-                    description="The AI backend (Ollama) is currently offline. Try again shortly.",
-                    color=discord.Color.red()
-                ), ephemeral=True)
-            print("❌ Ollama server not available — skipping interaction.")
-            return
-
-        # 🛡️ Ensure we don't defer after already responding
-        if interaction.response.is_done():
-            print("⚠️ Interaction already acknowledged. Cannot defer.")
-            return
-
+        # ✅ Defer immediately to lock in interaction
         try:
             await interaction.response.defer(thinking=True)
         except (discord.NotFound, discord.HTTPException):
             print("❌ Could not defer. Interaction may have expired or already responded.")
+            return
+
+        # 🔍 Now safely check if Ollama is online
+        if not await is_ollama_online():
+            await interaction.followup.send(embed=Embed(
+                title="🛑 JengGPT is not available",
+                description="The AI backend (Ollama) is currently offline. Try again shortly.",
+                color=discord.Color.red()
+            ), ephemeral=True)
+            print("❌ Ollama server not available — skipping interaction.")
             return
 
         try:
