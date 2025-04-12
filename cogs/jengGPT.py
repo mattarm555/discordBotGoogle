@@ -27,23 +27,24 @@ class JengGPT(commands.Cog):
     async def askjeng(self, interaction: Interaction, prompt: str, model: str = DEFAULT_MODEL):
         # 🔍 Check Ollama status BEFORE deferring
         if not is_ollama_online():
-            await interaction.response.send_message(embed=Embed(
-                title="🛑 JengGPT is not available",
-                description="The AI backend (Ollama) is currently offline. Try again shortly.",
-                color=discord.Color.red()
-            ), ephemeral=True)
+            if not interaction.response.is_done():
+                await interaction.response.send_message(embed=Embed(
+                    title="🛑 JengGPT is not available",
+                    description="The AI backend (Ollama) is currently offline. Try again shortly.",
+                    color=discord.Color.red()
+                ), ephemeral=True)
             print("❌ Ollama server not available — skipping interaction.")
             return
 
-        # ✅ Avoid double-responses
+        # 🛡️ Ensure we don't defer after already responding
         if interaction.response.is_done():
-            print("⚠️ Interaction was already acknowledged, skipping defer.")
+            print("⚠️ Interaction already acknowledged. Cannot defer.")
             return
 
         try:
             await interaction.response.defer(thinking=True)
-        except discord.NotFound:
-            print("❌ Interaction expired before defer.")
+        except (discord.NotFound, discord.HTTPException):
+            print("❌ Could not defer. Interaction may have expired or already responded.")
             return
 
         try:
