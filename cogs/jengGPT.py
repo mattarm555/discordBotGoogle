@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands, Interaction, Embed
 import requests
+from json.decoder import JSONDecodeError  # Add this import to catch JSON errors
 
 OLLAMA_URL = "https://millennium-problems-building-bufing.trycloudflare.com"
 DEFAULT_MODEL = "mistral"
@@ -32,7 +33,17 @@ class JengGPT(commands.Cog):
             print("📡 Status Code:", response.status_code)
             print("🧾 Raw Response:", response.text[:300])
 
-            data = response.json()
+            try:
+                data = response.json()
+            except JSONDecodeError:
+                print("❌ Received non-JSON response from Ollama.")
+                await interaction.followup.send(embed=Embed(
+                    title="😴 JengGPT is Not Available",
+                    description="Sorry, JengGPT is not here right now! Please try again later.",
+                    color=discord.Color.orange()
+                ))
+                return
+
             answer = data.get("response", "No response received.")
 
             embed = Embed(
