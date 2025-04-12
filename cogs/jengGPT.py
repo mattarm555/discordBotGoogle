@@ -4,7 +4,7 @@ from discord import app_commands, Interaction, Embed
 import requests
 
 # Replace with your live localtunnel URL:
-OLLAMA_URL = "https://blue-cobras-shop.loca.lt"
+OLLAMA_URL = "https://upset-rivers-sip.loca.lt"
 
 class JengGPT(commands.Cog):
     def __init__(self, bot):
