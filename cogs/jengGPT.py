@@ -3,23 +3,28 @@ from discord.ext import commands
 from discord import app_commands, Interaction, Embed
 import requests
 
-# ✅ Latest working localtunnel URL
 OLLAMA_URL = "https://millennium-problems-building-bufing.trycloudflare.com"
+DEFAULT_MODEL = "mistral"
 
 class JengGPT(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @app_commands.command(name="askjeng", description="Ask your local AI anything.")
-    @app_commands.describe(prompt="What do you want to ask JengGPT?")
-    async def askjeng(self, interaction: Interaction, prompt: str):
+    @app_commands.describe(
+        prompt="What do you want to ask JengGPT?",
+        model="Which model to use (e.g., mistral, llama2, codellama, llama2-uncensored)"
+    )
+    async def askjeng(self, interaction: Interaction, prompt: str, model: str = DEFAULT_MODEL):
         await interaction.response.defer(thinking=True)
 
         try:
-            print(f"📝 Prompt received: {prompt}")
+            print(f"📝 Prompt: {prompt}")
+            print(f"🤖 Model selected: {model}")
             print("🔁 Sending prompt to:", OLLAMA_URL)
+
             response = requests.post(f"{OLLAMA_URL}/api/generate", json={
-                "model": "llama2-uncensored",
+                "model": model,
                 "prompt": prompt,
                 "stream": False
             })
@@ -35,7 +40,7 @@ class JengGPT(commands.Cog):
                 description=f"**Prompt:** {prompt}\n\n{answer.strip()}",
                 color=discord.Color.dark_teal()
             )
-            embed.set_footer(text="Powered by Mistral via Ollama")
+            embed.set_footer(text=f"Powered by {model} via Ollama")
             await interaction.followup.send(embed=embed)
 
         except Exception as e:
