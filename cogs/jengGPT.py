@@ -40,6 +40,7 @@ class JengGPT(commands.Cog):
                 description=f"**Prompt:** {prompt}\n\n{answer.strip()}",
                 color=discord.Color.dark_teal()
             )
+            embed.add_field(name="🤖 Model Used", value=model, inline=False)
             embed.set_footer(text=f"Powered by {model} via Ollama")
             await interaction.followup.send(embed=embed)
 
