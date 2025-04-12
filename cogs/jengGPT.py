@@ -2,11 +2,9 @@ import discord
 from discord.ext import commands
 from discord import app_commands, Interaction, Embed
 import requests
-import os
-from json.decoder import JSONDecodeError  # Add this import to catch JSON errors
+from json.decoder import JSONDecodeError
 
-OLLAMA_URL = "https://millennium-problems-building-bufing.trycloudflare.com"
-SD_URL = "http://localhost:7860"
+OLLAMA_URL = "https://br-smooth-license-celebrate.trycloudflare.com"
 DEFAULT_MODEL = "mistral"
 
 class JengGPT(commands.Cog):
@@ -80,7 +78,6 @@ class JengGPT(commands.Cog):
                 description=f"```\n{str(e)}\n```",
                 color=discord.Color.red()
             ))
-
 
 async def setup(bot):
     await bot.add_cog(JengGPT(bot))
