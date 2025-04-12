@@ -17,18 +17,24 @@ class JengGPT(commands.Cog):
         model="Which model to use (e.g., mistral, llama2, codellama, llama2-uncensored)"
     )
     async def askjeng(self, interaction: Interaction, prompt: str, model: str = DEFAULT_MODEL):
-        await interaction.response.defer(thinking=True)
+        # Defer immediately to avoid Discord timeout
+        try:
+            await interaction.response.defer(thinking=True)
+        except discord.NotFound:
+            print("❌ Interaction expired before defer.")
+            return
 
         try:
             print(f"📝 Prompt: {prompt}")
             print(f"🤖 Model selected: {model}")
             print("🔁 Sending prompt to:", OLLAMA_URL)
 
+            # Send request to Ollama with max 15s timeout (Discord interaction limit)
             response = requests.post(f"{OLLAMA_URL}/api/generate", json={
                 "model": model,
                 "prompt": prompt,
                 "stream": False
-            }, timeout=20)
+            }, timeout=15)
 
             print("📡 Status Code:", response.status_code)
             print("🧾 Raw Response:", response.text[:300])
@@ -53,6 +59,7 @@ class JengGPT(commands.Cog):
             )
             embed.add_field(name="🤖 Model Used", value=model, inline=False)
             embed.set_footer(text=f"Powered by {model} via Ollama")
+
             await interaction.followup.send(embed=embed)
 
         except requests.exceptions.ConnectionError:
