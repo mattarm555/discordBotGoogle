@@ -4,7 +4,7 @@ from discord import app_commands, Interaction, Embed
 import requests
 
 # ✅ Latest working localtunnel URL
-OLLAMA_URL = "http://192.168.10.241:11434"
+OLLAMA_URL = "http://dda8-153-33-26-102.ngrok-free.app"
 
 class JengGPT(commands.Cog):
     def __init__(self, bot):
