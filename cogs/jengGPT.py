@@ -7,6 +7,14 @@ from json.decoder import JSONDecodeError
 OLLAMA_URL = "https://breeding-lookup-performances-intro.trycloudflare.com"
 DEFAULT_MODEL = "mistral"
 
+# 🔍 Quick check to verify Ollama is up before deferring
+def is_ollama_online() -> bool:
+    try:
+        response = requests.get(f"{OLLAMA_URL}/api/tags", timeout=1)
+        return response.status_code == 200
+    except Exception:
+        return False
+
 class JengGPT(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -17,7 +25,16 @@ class JengGPT(commands.Cog):
         model="Which model to use (e.g., mistral, llama2, codellama, llama2-uncensored)"
     )
     async def askjeng(self, interaction: Interaction, prompt: str, model: str = DEFAULT_MODEL):
-        # Defer immediately to avoid Discord timeout
+        # 🔍 Check Ollama status BEFORE deferring
+        if not is_ollama_online():
+            await interaction.response.send_message(embed=Embed(
+                title="🛑 JengGPT is not available",
+                description="The AI backend (Ollama) is currently offline. Try again shortly.",
+                color=discord.Color.red()
+            ), ephemeral=True)
+            print("❌ Ollama server not available — skipping interaction.")
+            return
+
         try:
             await interaction.response.defer(thinking=True)
         except discord.NotFound:
@@ -29,7 +46,6 @@ class JengGPT(commands.Cog):
             print(f"🤖 Model selected: {model}")
             print("🔁 Sending prompt to:", OLLAMA_URL)
 
-            # Send request to Ollama with max 15s timeout (Discord interaction limit)
             response = requests.post(f"{OLLAMA_URL}/api/generate", json={
                 "model": model,
                 "prompt": prompt,
