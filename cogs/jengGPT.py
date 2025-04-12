@@ -35,6 +35,11 @@ class JengGPT(commands.Cog):
             print("❌ Ollama server not available — skipping interaction.")
             return
 
+        # ✅ Avoid double-responses
+        if interaction.response.is_done():
+            print("⚠️ Interaction was already acknowledged, skipping defer.")
+            return
+
         try:
             await interaction.response.defer(thinking=True)
         except discord.NotFound:
