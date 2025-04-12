@@ -4,7 +4,7 @@ from discord import app_commands, Interaction, Embed
 import requests
 from json.decoder import JSONDecodeError
 
-OLLAMA_URL = "https://consult-pas-touring-aims.trycloudflare.com"
+OLLAMA_URL = "https://breeding-lookup-performances-intro.trycloudflare.com"
 DEFAULT_MODEL = "mistral"
 
 class JengGPT(commands.Cog):
