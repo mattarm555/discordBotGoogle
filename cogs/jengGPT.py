@@ -4,7 +4,7 @@ from discord import app_commands, Interaction, Embed
 import requests
 
 # ✅ Latest working localtunnel URL
-OLLAMA_URL = "https://slightly-kai-mumbai-producer.trycloudflare.com"
+OLLAMA_URL = "https://millennium-problems-building-bufing.trycloudflare.com"
 
 class JengGPT(commands.Cog):
     def __init__(self, bot):
