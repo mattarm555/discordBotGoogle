@@ -6,7 +6,7 @@ import requests
 import time
 from json.decoder import JSONDecodeError
 
-OLLAMA_URL = "https://incomplete-editor-treated-focus.trycloudflare.com"
+OLLAMA_URL = "https://dat-volleyball-december-discussing.trycloudflare.com"
 DEFAULT_MODEL = "mistral"
 
 # 🔍 Async check to verify Ollama is up before deferring
@@ -151,12 +151,21 @@ class JengGPT(commands.Cog):
                 ))
                 return
 
-            # Step 2: Send a dummy prompt to warm it up
-            response = requests.post(f"{OLLAMA_URL}/api/generate", json={
-                "model": model,
-                "prompt": "Hello",
-                "stream": False
-            }, timeout=15)
+            # Step 2: Try warming up the model with a dummy prompt
+            try:
+                response = requests.post(f"{OLLAMA_URL}/api/generate", json={
+                    "model": model,
+                    "prompt": "Hello",
+                    "stream": False
+                }, timeout=15)
+            except Exception:
+                print("❌ Warmup request failed due to timeout or unreachable host.")
+                await interaction.followup.send(embed=Embed(
+                    title="😴 JengGPT is Offline",
+                    description="Warmup failed. JengGPT is not responding or offline.",
+                    color=discord.Color.orange()
+                ))
+                return
 
             elapsed = time.monotonic() - start_time
 
@@ -164,8 +173,7 @@ class JengGPT(commands.Cog):
                 print(f"⚠️ Ollama warmup failed (status {response.status_code}) in {elapsed:.2f}s")
                 await interaction.followup.send(embed=Embed(
                     title="⚠️ Warmup Failed",
-                    description=f"Ollama responded with status code `{response.status_code}`.\n"
-                                f"Response:\n```\n{response.text[:300]}\n```",
+                    description=f"Ollama responded with status code `{response.status_code}`.",
                     color=discord.Color.orange()
                 ))
                 return
@@ -183,7 +191,7 @@ class JengGPT(commands.Cog):
             print("❌ Warmup error:", e)
             await interaction.followup.send(embed=Embed(
                 title="❌ Warmup Failed",
-                description=f"```\n{str(e)}\n```",
+                description="Warmup failed. JengGPT is not responding or offline.",
                 color=discord.Color.red()
             ))
 
