@@ -106,7 +106,7 @@ class JengGPT(commands.Cog):
 
     @app_commands.command(name="warmup", description="Ping Ollama and warm up a specific model.")
     @app_commands.describe(
-        model="Which model to warm up (e.g., mistral, llama2, codellama)"
+        model="Which model to warm up (e.g., mistral, llama2, codellama. llam2-uncensored)"
     )
     async def warmup(self, interaction: Interaction, model: str = DEFAULT_MODEL):
         try:
