@@ -6,7 +6,7 @@ import requests
 import time
 from json.decoder import JSONDecodeError
 
-OLLAMA_URL = "https://breeding-lookup-performances-intro.trycloudflare.com"
+OLLAMA_URL = "https://incomplete-editor-treated-focus.trycloudflare.com"
 DEFAULT_MODEL = "mistral"
 
 # 🔍 Async check to verify Ollama is up before deferring
