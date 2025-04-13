@@ -148,6 +148,8 @@ class Misc(commands.Cog):
         misc_embed = Embed(title="😂 Miscellaneous Commands", color=discord.Color.purple())
         misc_embed.add_field(name="/champ", value="Selects a random champion.", inline=False)
         misc_embed.add_field(name="/spam <user> <num>", value="Spams a user a specified number of times.", inline=False)
+        misc_embed.add_field(name="/askjeng <prompt> <model>", value="Ask an AI that runs locally on Jeng's computer! If it is your first quetsion of the day, I recommend using /warmup <model> first.", inline=False)
+        misc_embed.add_field(name="/warmup <model>", value="Warms up a specific ollama model to prevent timeout errors.", inline=False)
         misc_embed.set_footer(text="Page 3/5")
         pages.append(misc_embed)
 
