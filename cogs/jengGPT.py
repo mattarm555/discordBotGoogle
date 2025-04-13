@@ -109,23 +109,49 @@ class JengGPT(commands.Cog):
         model="Which model to warm up (e.g., mistral, llama2, codellama)"
     )
     async def warmup(self, interaction: Interaction, model: str = DEFAULT_MODEL):
-        await interaction.response.defer(thinking=True)
+        try:
+            await interaction.response.defer(thinking=True)
+        except (discord.NotFound, discord.HTTPException):
+            print("❌ Could not defer. Interaction may have expired or already responded.")
+            return
 
         try:
             start_time = time.monotonic()
 
-            # Step 1: Ping Ollama to confirm it's up
-            async with aiohttp.ClientSession() as session:
-                async with session.get(f"{OLLAMA_URL}/api/tags", timeout=3) as ping:
-                    if ping.status != 200:
-                        await interaction.followup.send(embed=Embed(
-                            title="❌ Ollama is not responding",
-                            description="Ping to the AI backend failed.",
-                            color=discord.Color.red()
-                        ))
-                        return
+            # Step 1: Check if Ollama is online and get loaded models
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(f"{OLLAMA_URL}/api/tags", timeout=3) as ping:
+                        if ping.status != 200:
+                            print(f"❌ Ollama ping failed with status {ping.status}")
+                            await interaction.followup.send(embed=Embed(
+                                title="❌ Ollama is not responding",
+                                description="Ping to the AI backend failed.",
+                                color=discord.Color.red()
+                            ))
+                            return
+                        tag_data = await ping.json()
+                        model_list = tag_data.get("models") or tag_data.get("tags") or []
+                        available_models = [m["name"] if isinstance(m, dict) else m for m in model_list]
 
-            # Step 2: Send a dummy prompt to the selected model
+                        if model in available_models:
+                            print(f"🟢 Model '{model}' is already loaded.")
+                            await interaction.followup.send(embed=Embed(
+                                title="🟢 Model Already Active",
+                                description=f"The model **`{model}`** is already running and ready to use.",
+                                color=discord.Color.blurple()
+                            ))
+                            return
+            except Exception:
+                print("❌ Ollama server is offline or unreachable.")
+                await interaction.followup.send(embed=Embed(
+                    title="😴 JengGPT is Offline",
+                    description="Sorry, JengGPT is not here right now! Please try again later.",
+                    color=discord.Color.orange()
+                ))
+                return
+
+            # Step 2: Send a dummy prompt to warm it up
             response = requests.post(f"{OLLAMA_URL}/api/generate", json={
                 "model": model,
                 "prompt": "Hello",
@@ -135,6 +161,7 @@ class JengGPT(commands.Cog):
             elapsed = time.monotonic() - start_time
 
             if response.status_code != 200:
+                print(f"⚠️ Ollama warmup failed (status {response.status_code}) in {elapsed:.2f}s")
                 await interaction.followup.send(embed=Embed(
                     title="⚠️ Warmup Failed",
                     description=f"Ollama responded with status code `{response.status_code}`.\n"
