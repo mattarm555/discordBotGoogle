@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord import app_commands, Interaction, Embed
 import aiohttp
 import requests
+import time
 from json.decoder import JSONDecodeError
 
 OLLAMA_URL = "https://breeding-lookup-performances-intro.trycloudflare.com"
@@ -27,14 +28,12 @@ class JengGPT(commands.Cog):
         model="Which model to use (e.g., mistral, llama2, codellama, llama2-uncensored)"
     )
     async def askjeng(self, interaction: Interaction, prompt: str, model: str = DEFAULT_MODEL):
-        # ✅ Defer immediately to lock in interaction
         try:
             await interaction.response.defer(thinking=True)
         except (discord.NotFound, discord.HTTPException):
             print("❌ Could not defer. Interaction may have expired or already responded.")
             return
 
-        # 🔍 Now safely check if Ollama is online
         if not await is_ollama_online():
             await interaction.followup.send(embed=Embed(
                 title="🛑 JengGPT is not available",
@@ -101,6 +100,62 @@ class JengGPT(commands.Cog):
             print("❌ Exception occurred:", e)
             await interaction.followup.send(embed=Embed(
                 title="❌ Error",
+                description=f"```\n{str(e)}\n```",
+                color=discord.Color.red()
+            ))
+
+    @app_commands.command(name="warmup", description="Ping Ollama and warm up a specific model.")
+    @app_commands.describe(
+        model="Which model to warm up (e.g., mistral, llama2, codellama)"
+    )
+    async def warmup(self, interaction: Interaction, model: str = DEFAULT_MODEL):
+        await interaction.response.defer(thinking=True)
+
+        try:
+            start_time = time.monotonic()
+
+            # Step 1: Ping Ollama to confirm it's up
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"{OLLAMA_URL}/api/tags", timeout=3) as ping:
+                    if ping.status != 200:
+                        await interaction.followup.send(embed=Embed(
+                            title="❌ Ollama is not responding",
+                            description="Ping to the AI backend failed.",
+                            color=discord.Color.red()
+                        ))
+                        return
+
+            # Step 2: Send a dummy prompt to the selected model
+            response = requests.post(f"{OLLAMA_URL}/api/generate", json={
+                "model": model,
+                "prompt": "Hello",
+                "stream": False
+            }, timeout=15)
+
+            elapsed = time.monotonic() - start_time
+
+            if response.status_code != 200:
+                await interaction.followup.send(embed=Embed(
+                    title="⚠️ Warmup Failed",
+                    description=f"Ollama responded with status code `{response.status_code}`.\n"
+                                f"Response:\n```\n{response.text[:300]}\n```",
+                    color=discord.Color.orange()
+                ))
+                return
+
+            await interaction.followup.send(embed=Embed(
+                title="✅ Warmup Complete",
+                description=f"Model **`{model}`** is now active.\n"
+                            f"Warmup time: **{elapsed:.2f} seconds**",
+                color=discord.Color.green()
+            ))
+
+            print(f"🔥 Model '{model}' warmed up in {elapsed:.2f} seconds.")
+
+        except Exception as e:
+            print("❌ Warmup error:", e)
+            await interaction.followup.send(embed=Embed(
+                title="❌ Warmup Failed",
                 description=f"```\n{str(e)}\n```",
                 color=discord.Color.red()
             ))
