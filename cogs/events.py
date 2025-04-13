@@ -18,19 +18,20 @@ def debug_command(name, user, **kwargs):
             print(f"  {key}: {value}")
 
 class RSVPView(ui.View):
-    def __init__(self, creator, title, time, location, details):
+    def __init__(self, creator, title, time, location, details, description="Click a button to RSVP!"):
         super().__init__(timeout=None)
         self.creator = creator
         self.title = title
         self.time = time
         self.location = location
         self.details = details
+        self.description = description
         self.going = set()
         self.not_going = set()
         self.message = None
 
     def format_embed(self):
-        embed = Embed(title=f"📅 {self.title}", description="Click a button to RSVP!", color=discord.Color.gold())
+        embed = Embed(title=f"📅 {self.title}", description=self.description, color=discord.Color.gold())
         embed.add_field(name="🕒 Time", value=self.time, inline=False)
         embed.add_field(name="📍 Location", value=self.location, inline=False)
         embed.add_field(name="📝 Details", value=self.details or "None", inline=False)
@@ -64,9 +65,10 @@ class Events(commands.Cog):
         title="Event title",
         time="When is the event?",
         location="Where is it?",
-        details="More information about the event"
+        details="More information about the event",
+        description="Top message in the embed (e.g., RSVP instructions)"
     )
-    async def event(self, interaction: Interaction, title: str, time: str, location: str, details: str = ""):
+    async def event(self, interaction: Interaction, title: str, time: str, location: str, details: str = "", description: str = "Click a button to RSVP!"):
         await interaction.response.defer()
 
         debug_command(
@@ -74,7 +76,8 @@ class Events(commands.Cog):
             title=title,
             time=time,
             location=location,
-            details=details
+            details=details,
+            description=description
         )
 
         view = RSVPView(
@@ -82,7 +85,8 @@ class Events(commands.Cog):
             title=title,
             time=time,
             location=location,
-            details=details
+            details=details,
+            description=description
         )
 
         embed = view.format_embed()
@@ -92,4 +96,3 @@ class Events(commands.Cog):
 # --- Cog Setup ---
 async def setup(bot):
     await bot.add_cog(Events(bot))
-
