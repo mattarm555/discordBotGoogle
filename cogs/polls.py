@@ -31,7 +31,6 @@ class Polls(commands.Cog):
     @app_commands.describe(
         question="Your poll question",
         duration_minutes="How many minutes until the poll closes?",
-        anonymous="Hide voter usernames in the final results?",
         option1_text="Option 1 text", option1_emoji="Option 1 emoji",
         option2_text="Option 2 text", option2_emoji="Option 2 emoji",
         option3_text="Option 3 text", option3_emoji="Option 3 emoji",
@@ -44,7 +43,6 @@ class Polls(commands.Cog):
         interaction: Interaction,
         question: str,
         duration_minutes: int,
-        anonymous: bool,
         option1_text: str, option1_emoji: str,
         option2_text: str, option2_emoji: str,
         option3_text: str = None, option3_emoji: str = None,
@@ -54,12 +52,11 @@ class Polls(commands.Cog):
     ):
         await interaction.response.defer()
 
-        # Debug
+        # Debug log
         debug_command(
             "poll", interaction.user,
             question=question,
             duration=f"{duration_minutes} min",
-            anonymous=anonymous,
             options={f"{text}": emoji for text, emoji in [
                 (option1_text, option1_emoji),
                 (option2_text, option2_emoji),
@@ -70,7 +67,7 @@ class Polls(commands.Cog):
             ] if text and emoji}
         )
 
-        # Build valid options list
+        # Build options list
         options = []
         for text, emoji in [
             (option1_text, option1_emoji),
@@ -94,12 +91,12 @@ class Polls(commands.Cog):
             )
             return
 
-        # Record time
+        # Record timestamps
         eastern = pytz.timezone("US/Eastern")
         start_time = datetime.now(eastern)
         end_time = start_time + timedelta(minutes=duration_minutes)
 
-        # Send poll embed
+        # Initial poll embed
         embed = Embed(title="📊 Poll", description=question, color=discord.Color.blurple())
         for text, emoji in options:
             embed.add_field(name=f"{emoji} {text}", value=" ", inline=False)
@@ -116,13 +113,13 @@ class Polls(commands.Cog):
             except:
                 pass  # Skip invalid emojis
 
-        # Wait for poll to finish
+        # Wait until poll closes
         await asyncio.sleep(duration_minutes * 60)
 
-        # Fetch updated message
+        # Refresh message to get final reactions
         msg = await interaction.channel.fetch_message(msg.id)
 
-        # Tally votes
+        # Count votes
         votes = {}
         user_voted = set()
 
@@ -136,15 +133,12 @@ class Polls(commands.Cog):
                     votes.setdefault(str(reaction.emoji), []).append(user)
                     user_voted.add(user.id)
 
-        # Build results
-        result_embed = Embed(title="📊 Poll Results", description=question, color=discord.Color.gray())
+        # Results embed
+        result_embed = Embed(title="📊 Poll Results", description=question, color=discord.Color.yellow())
         for text, emoji in options:
             voters = votes.get(emoji, [])
             count = len(voters)
-            if anonymous:
-                value = f"**{count} vote(s)**"
-            else:
-                value = f"**{count} vote(s)**\n" + (", ".join(u.display_name for u in voters) or "No votes")
+            value = f"**{count} vote(s)**\n" + (", ".join(u.display_name for u in voters) or "No votes")
             result_embed.add_field(name=f"{emoji} {text}", value=value, inline=False)
 
         result_embed.set_footer(
