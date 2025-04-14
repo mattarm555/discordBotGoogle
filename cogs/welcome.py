@@ -47,7 +47,7 @@ class Welcome(commands.Cog):
                 await member.add_roles(role)
 
         # Format the welcome message
-        formatted_message = welcome_message.format(user=member.name, server=member.guild.name)
+        formatted_message = welcome_message.format(user=member.mention, server=member.guild.name)
 
         # Send the welcome embed
         channel = member.guild.get_channel(int(channel_id))
