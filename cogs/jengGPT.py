@@ -6,6 +6,16 @@ import requests
 import time
 from json.decoder import JSONDecodeError
 
+RESET = "\033[0m"
+BLACK = "\033[30m"
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+BLUE = "\033[34m"
+MAGENTA = "\033[35m"
+CYAN = "\033[36m"
+WHITE = "\033[37m"
+
 OLLAMA_URL = "https://burlington-money-emotions-variance.trycloudflare.com"
 DEFAULT_MODEL = "mistral"
 
@@ -31,7 +41,7 @@ class JengGPT(commands.Cog):
         try:
             await interaction.response.defer(thinking=True)
         except (discord.NotFound, discord.HTTPException):
-            print("❌ Could not defer. Interaction may have expired or already responded.")
+            print(f"❌ {GREEN}Could not defer. Interaction may have expired or already responded.{RESET}")
             return
 
         if not await is_ollama_online():
@@ -40,13 +50,13 @@ class JengGPT(commands.Cog):
                 description="The AI backend (Ollama) is currently offline. Try again shortly.",
                 color=discord.Color.red()
             ), ephemeral=True)
-            print("❌ Ollama server not available — skipping interaction.")
+            print(f"❌ {GREEN}Ollama server not available — skipping interaction.{RESET}")
             return
 
         try:
-            print(f"📝 Prompt: {prompt}")
-            print(f"🤖 Model selected: {model}")
-            print("🔁 Sending prompt to:", OLLAMA_URL)
+            print(f"📝 {CYAN}Prompt: {prompt}{RESET}")
+            print(f"🤖 {CYAN}Model selected: {model}{RESET}")
+            print(f"🔁 {CYAN}Sending prompt to:{RESET}", OLLAMA_URL)
 
             response = requests.post(f"{OLLAMA_URL}/api/generate", json={
                 "model": model,
@@ -54,13 +64,13 @@ class JengGPT(commands.Cog):
                 "stream": False
             }, timeout=15)
 
-            print("📡 Status Code:", response.status_code)
-            print("🧾 Raw Response:", response.text[:300])
+            print(f"📡 {MAGENTA}Status Code:{RESET}", response.status_code)
+            print(f"🧾 {MAGENTA}Raw Response:{RESET}", response.text[:300])
 
             try:
                 data = response.json()
             except JSONDecodeError:
-                print("❌ Received non-JSON response from Ollama.")
+                print(f"❌ {GREEN}Received non-JSON response from Ollama.{RESET}")
                 await interaction.followup.send(embed=Embed(
                     title="😴 JengGPT is Not Available",
                     description="Sorry, JengGPT is not here right now! Please try again later.",
@@ -81,7 +91,7 @@ class JengGPT(commands.Cog):
             await interaction.followup.send(embed=embed)
 
         except requests.exceptions.ConnectionError:
-            print("❌ Could not connect to Ollama server.")
+            print(f"❌ {GREEN}Could not connect to Ollama server.{RESET}")
             await interaction.followup.send(embed=Embed(
                 title="😴 JengGPT is Offline",
                 description="Sorry, JengGPT is not here right now! Please try again later.",
@@ -89,7 +99,7 @@ class JengGPT(commands.Cog):
             ))
 
         except requests.exceptions.Timeout:
-            print("⏳ Request to Ollama timed out.")
+            print(f"⏳ {GREEN}Request to Ollama timed out.{RESET}")
             await interaction.followup.send(embed=Embed(
                 title="⏳ Timeout",
                 description="JengGPT took too long to respond. Try again in a moment!",
@@ -97,7 +107,7 @@ class JengGPT(commands.Cog):
             ))
 
         except Exception as e:
-            print("❌ Exception occurred:", e)
+            print(f"❌ {GREEN}Exception occurred:{RESET}", e)
             await interaction.followup.send(embed=Embed(
                 title="❌ Error",
                 description=f"```\n{str(e)}\n```",
@@ -112,7 +122,7 @@ class JengGPT(commands.Cog):
         try:
             await interaction.response.defer(thinking=True)
         except (discord.NotFound, discord.HTTPException):
-            print("❌ Could not defer. Interaction may have expired or already responded.")
+            print(f"❌ {GREEN}Could not defer. Interaction may have expired or already responded.{RESET}")
             return
 
         try:
@@ -123,7 +133,7 @@ class JengGPT(commands.Cog):
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f"{OLLAMA_URL}/api/tags", timeout=3) as ping:
                         if ping.status != 200:
-                            print(f"❌ Ollama ping failed with status {ping.status}")
+                            print(f"❌ {GREEN}Ollama ping failed with status {RESET}{ping.status}")
                             await interaction.followup.send(embed=Embed(
                                 title="❌ Ollama is not responding",
                                 description="Ping to the AI backend failed.",
@@ -143,7 +153,7 @@ class JengGPT(commands.Cog):
                             ))
                             return
             except Exception:
-                print("❌ Ollama server is offline or unreachable.")
+                print(f"❌ {GREEN}Ollama server is offline or unreachable.{RESET}")
                 await interaction.followup.send(embed=Embed(
                     title="😴 JengGPT is Offline",
                     description="Sorry, JengGPT is not here right now! Please try again later.",
@@ -159,7 +169,7 @@ class JengGPT(commands.Cog):
                     "stream": False
                 }, timeout=15)
             except Exception:
-                print("❌ Warmup request failed due to timeout or unreachable host.")
+                print(f"❌ {GREEN}Warmup request failed due to timeout or unreachable host.{RESET}")
                 await interaction.followup.send(embed=Embed(
                     title="😴 JengGPT is Offline",
                     description="Warmup failed. JengGPT is not responding or offline.",
@@ -170,7 +180,7 @@ class JengGPT(commands.Cog):
             elapsed = time.monotonic() - start_time
 
             if response.status_code != 200:
-                print(f"⚠️ Ollama warmup failed (status {response.status_code}) in {elapsed:.2f}s")
+                print(f"⚠️ {GREEN}Ollama warmup failed (status {response.status_code}) in {elapsed:.2f}s{RESET}")
                 await interaction.followup.send(embed=Embed(
                     title="⚠️ Warmup Failed",
                     description=f"Ollama responded with status code `{response.status_code}`.",
@@ -185,10 +195,10 @@ class JengGPT(commands.Cog):
                 color=discord.Color.green()
             ))
 
-            print(f"🔥 Model '{model}' warmed up in {elapsed:.2f} seconds.")
+            print(f"🔥 {MAGENTA}Model '{model}' warmed up in {elapsed:.2f} seconds.{RESET}")
 
         except Exception as e:
-            print("❌ Warmup error:", e)
+            print(f"❌ {GREEN}Warmup error:{RESET}", e)
             await interaction.followup.send(embed=Embed(
                 title="❌ Warmup Failed",
                 description="Warmup failed. JengGPT is not responding or offline.",
