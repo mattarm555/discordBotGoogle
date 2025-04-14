@@ -7,11 +7,15 @@ import json
 QUOTE_FILE = "quotes.json"
 
 # Color codes for debug output
-GREEN = "\033[1;32m"
-YELLOW = "\033[1;33m"
-CYAN = "\033[1;36m"
-RED = "\033[1;31m"
 RESET = "\033[0m"
+BOLD = "\033[1m"
+DIM = "\033[2m"
+ITALIC = "\033[3m"
+UNDERLINE = "\033[4m"
+BLINK = "\033[5m"
+REVERSE = "\033[7m"
+HIDDEN = "\033[8m"
+RED = "\033[31m"
 
 def load_quote_data():
     if os.path.exists(QUOTE_FILE):
