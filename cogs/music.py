@@ -21,7 +21,7 @@ WHITE = "\033[37m"
 def debug_command(command_name, user, **kwargs):
     print(f"{RED}[COMMAND] /{command_name}{RESET} triggered by {YELLOW}{user.display_name}{RESET}")
     if kwargs:
-        print("{BLUE}Input:{RESET}")
+        print(f"{BLUE}Input:{RESET}")
         for key, value in kwargs.items():
             print(f"{RED}  {key.capitalize()}: {value}{RESET}")
 
