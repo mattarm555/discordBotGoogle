@@ -29,6 +29,7 @@ class RSVPView(ui.View):
         self.going = set()
         self.not_going = set()
         self.message = None
+        self.created_at = datetime.now(pytz.timezone("US/Eastern"))  # store creation time
 
     def format_embed(self):
         embed = Embed(title=f"📅 {self.title}", description=self.description, color=discord.Color.gold())
@@ -37,8 +38,10 @@ class RSVPView(ui.View):
         embed.add_field(name="📝 Details", value=self.details or "None", inline=False)
         embed.add_field(name="✅ Going", value="\n".join(u.mention for u in self.going) or "No one yet", inline=True)
         embed.add_field(name="❌ Not Going", value="\n".join(u.mention for u in self.not_going) or "No one yet", inline=True)
-        embed.set_footer(text=f"Event created by {self.creator.display_name}")
-        embed.timestamp = datetime.now(pytz.timezone("US/Eastern"))
+        
+        created_str = self.created_at.strftime("%B %d, %I:%M %p ET")
+        embed.set_footer(text=f"🕰️ Created at {created_str} by {self.creator.display_name}")
+
         return embed
 
     @ui.button(label="✅ Going", style=discord.ButtonStyle.success)
