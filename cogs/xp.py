@@ -15,6 +15,7 @@ BLUE = "\033[34m"
 MAGENTA = "\033[35m"
 CYAN = "\033[36m"
 WHITE = "\033[37m"
+BOLD = "\033[1m"
 
 # --- XP Settings ---
 XP_FILE = "xp_data.json"
