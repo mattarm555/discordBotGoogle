@@ -7,13 +7,23 @@ import math
 
 queues = {}
 
+RESET = "\033[0m"
+BLACK = "\033[30m"
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+BLUE = "\033[34m"
+MAGENTA = "\033[35m"
+CYAN = "\033[36m"
+WHITE = "\033[37m"
+
 # Debug logger
 def debug_command(command_name, user, **kwargs):
-    print(f"\033[1;32m[COMMAND] /{command_name}\033[0m triggered by \033[1;33m{user.display_name}\033[0m")
+    print(f"{RED}[COMMAND] /{command_name}{RESET} triggered by {YELLOW}{user.display_name}{RESET}")
     if kwargs:
-        print("\033[1;36mInput:\033[0m")
+        print("{BLUE}Input:{RESET}")
         for key, value in kwargs.items():
-            print(f"\033[1;31m  {key.capitalize()}: {value}\033[0m")
+            print(f"{RED}  {key.capitalize()}: {value}{RESET}")
 
 class QueueView(ui.View):
     def __init__(self, queue, per_page=5):
