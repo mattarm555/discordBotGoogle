@@ -8,6 +8,16 @@ from datetime import datetime
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
 
+RESET = "\033[0m"
+BLACK = "\033[30m"
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+BLUE = "\033[34m"
+MAGENTA = "\033[35m"
+CYAN = "\033[36m"
+WHITE = "\033[37m"
+
 
 # Intents
 intents = discord.Intents.default()
@@ -34,13 +44,13 @@ class JengBot(commands.Bot):
     
     async def on_ready(self):
         await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="/help"))
-        print(f"Logged in as {self.user}")
-        print("Connected to:")
-        print(f"Cogs Loaded: {list(bot.cogs.keys())}")
+        print(f"{YELLOW}Logged in as {self.user}{RESET}")
+        print(f"{RED}Connected to:{RESET}")
+        print(f"{RED}Cogs Loaded: {list(bot.cogs.keys())}{RESET}")
         for guild in self.guilds:
-            print(f" - {guild.name} ({guild.id})")
+            print(f"{BLUE} - {guild.name} ({guild.id}){RESET}")
         await self.tree.sync()
-        print("Slash commands synced globally")
+        print(f"{MAGENTA}Slash commands synced globally{RESET}")
 
 bot = JengBot()
 
