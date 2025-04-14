@@ -6,10 +6,15 @@ from datetime import datetime
 import pytz
 
 # --- Color Codes ---
-GREEN = "\033[92m"
-YELLOW = "\033[93m"
-CYAN = "\033[96m"
 RESET = "\033[0m"
+BOLD = "\033[1m"
+DIM = "\033[2m"
+ITALIC = "\033[3m"
+UNDERLINE = "\033[4m"
+BLINK = "\033[5m"
+REVERSE = "\033[7m"
+HIDDEN = "\033[8m"
+RED = "\033[31m"
 
 def debug_command(name, user, **kwargs):
     print(f"{GREEN}[COMMAND] /{name}{RESET} triggered by {YELLOW}{user.display_name}{RESET}")
