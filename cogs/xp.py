@@ -120,7 +120,7 @@ class XPSystem(commands.Cog):
     # Determine the rank
         rank = next((i for i, (uid, _) in enumerate(all_users, 1) if uid == user_id), "Unknown")
 
-        print(f"{BOLD}{CYAN}[COMMAND]{RESET} /level used by {YELLOW}{interaction.user.display_name}{RESET}")
+        print(f"{BOLD}{CYAN}[COMMAND] /level{RESET} used by {YELLOW}{interaction.user.display_name}{RESET}")
 
         embed = discord.Embed(
             title="🏆 XP Level",
@@ -144,7 +144,7 @@ class XPSystem(commands.Cog):
     async def leaderboard(self, interaction: discord.Interaction):
         guild_id = str(interaction.guild.id)
 
-        print(f"{BOLD}{CYAN}[COMMAND]{RESET} /leaderboard used by {YELLOW}{interaction.user.display_name}{RESET}")
+        print(f"{BOLD}{CYAN}[COMMAND] /leaderboard{RESET} used by {YELLOW}{interaction.user.display_name}{RESET}")
 
     # If there's no data yet
         if guild_id not in self.xp_data or not self.xp_data[guild_id]:
