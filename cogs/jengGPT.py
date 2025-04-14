@@ -94,7 +94,7 @@ class JengGPT(commands.Cog):
             print(f"❌ {GREEN}Could not connect to Ollama server.{RESET}")
             await interaction.followup.send(embed=Embed(
                 title="😴 JengGPT is Offline",
-                description="Sorry, JengGPT is not here right now! Please try again later.",
+                description="Sorry, JengGPT is not here right now! I recommend trying /warmup before you ask a question for better response times.",
                 color=discord.Color.orange()
             ))
 
@@ -102,7 +102,7 @@ class JengGPT(commands.Cog):
             print(f"⏳ {GREEN}Request to Ollama timed out.{RESET}")
             await interaction.followup.send(embed=Embed(
                 title="⏳ Timeout",
-                description="JengGPT took too long to respond. Try again in a moment!",
+                description="JengGPT took too long to respond. I recommend trying /warmup before you ask a question for better response times.",
                 color=discord.Color.orange()
             ))
 
@@ -156,7 +156,7 @@ class JengGPT(commands.Cog):
                 print(f"❌ {GREEN}Ollama server is offline or unreachable.{RESET}")
                 await interaction.followup.send(embed=Embed(
                     title="😴 JengGPT is Offline",
-                    description="Sorry, JengGPT is not here right now! Please try again later.",
+                    description="Sorry, JengGPT is not here right now! I recommend trying /warmup before you ask a question for better response times.",
                     color=discord.Color.orange()
                 ))
                 return
