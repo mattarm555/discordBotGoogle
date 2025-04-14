@@ -7,9 +7,12 @@ import os
 # --- Console Colors ---
 RESET = "\033[0m"
 BOLD = "\033[1m"
-CYAN = "\033[96m"
-YELLOW = "\033[93m"
-BLUE = "\033[94m"
+DIM = "\033[2m"
+ITALIC = "\033[3m"
+UNDERLINE = "\033[4m"
+BLINK = "\033[5m"
+REVERSE = "\033[7m"
+HIDDEN = "\033[8m"
 
 WELCOME_CONFIG = "welcome_config.json"
 
@@ -64,7 +67,7 @@ class Welcome(commands.Cog):
             await channel.send(embed=embed)
 
             # DEBUG LOG
-            print(f"{BOLD}{CYAN}[WELCOME]{RESET} Welcomed {YELLOW}{member.name}{RESET} to {BLUE}{member.guild.name}{RESET}")
+            print(f"{BOLD}{RED}[WELCOME]{RESET} Welcomed {BOLD}{YELLOW}{member.name}{RESET} to {BOLD}{BLUE}{member.guild.name}{RESET}")
 
     @app_commands.command(name="setwelcome", description="Configure the welcome message settings.")
     @app_commands.describe(channel="The channel to send welcome messages to.", message="The welcome message. Use {user} and {server}.", role="Optional role to assign to new members.")
