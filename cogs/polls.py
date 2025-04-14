@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands, Interaction, Embed
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 
 # --- Color Codes ---
@@ -84,15 +84,29 @@ class Polls(commands.Cog):
                 options.append((text, emoji))
 
         if len(options) < 2:
-            await interaction.followup.send(embed=Embed(title="❌ Error", description="You need at least 2 options.", color=discord.Color.red()), ephemeral=True)
+            await interaction.followup.send(
+                embed=Embed(
+                    title="❌ Error",
+                    description="You need at least 2 options.",
+                    color=discord.Color.red()
+                ),
+                ephemeral=True
+            )
             return
+
+        # Record time
+        eastern = pytz.timezone("US/Eastern")
+        start_time = datetime.now(eastern)
+        end_time = start_time + timedelta(minutes=duration_minutes)
 
         # Send poll embed
         embed = Embed(title="📊 Poll", description=question, color=discord.Color.blurple())
         for text, emoji in options:
             embed.add_field(name=f"{emoji} {text}", value=" ", inline=False)
-        embed.set_footer(text=f"Poll closes in {duration_minutes} minutes • Created by {interaction.user.display_name}")
-        embed.timestamp = datetime.now(pytz.timezone("US/Eastern"))
+        embed.set_footer(
+            text=f"Poll closes at {end_time.strftime('%I:%M %p %Z')} • Created by {interaction.user.display_name}"
+        )
+        embed.timestamp = start_time
 
         msg = await interaction.followup.send(embed=embed, wait=True)
 
@@ -123,17 +137,23 @@ class Polls(commands.Cog):
                     user_voted.add(user.id)
 
         # Build results
-        result_embed = Embed(title="📊 Poll Closed", description=question, color=discord.Color.gray())
+        result_embed = Embed(title="📊 Poll Results", description=question, color=discord.Color.gray())
         for text, emoji in options:
             voters = votes.get(emoji, [])
             count = len(voters)
-            value = f"**{count} vote(s)**" if anonymous else f"**{count} vote(s)**\n" + ", ".join(u.display_name for u in voters) or "No votes"
+            if anonymous:
+                value = f"**{count} vote(s)**"
+            else:
+                value = f"**{count} vote(s)**\n" + (", ".join(u.display_name for u in voters) or "No votes")
             result_embed.add_field(name=f"{emoji} {text}", value=value, inline=False)
 
-        result_embed.set_footer(text=f"Poll created by {interaction.user.display_name}")
+        result_embed.set_footer(
+            text=f"Poll started at {start_time.strftime('%I:%M %p %Z')} • Ended at {end_time.strftime('%I:%M %p %Z')} • Created by {interaction.user.display_name}"
+        )
+        result_embed.timestamp = end_time
+
         await msg.edit(embed=result_embed)
 
 # --- Cog setup ---
 async def setup(bot):
     await bot.add_cog(Polls(bot))
-
