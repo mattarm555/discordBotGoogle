@@ -80,6 +80,8 @@ class Welcome(commands.Cog):
             "role_id": str(role.id) if role else None
         }
 
+        print(f"{BOLD}{RED}[COMMAND] /set_welcome{RESET}  used by {YELLOW}{interaction.user.display_name}{RESET}")
+        
         save_welcome_config(self.welcome_config)
 
         embed = discord.Embed(
@@ -102,6 +104,9 @@ class Welcome(commands.Cog):
             )
             await interaction.response.send_message(embed=embed)
             return
+
+
+        print(f"{BOLD}{RED}[COMMAND] /level{RESET} used by {YELLOW}{interaction.user.display_name}{RESET}")
 
         channel = self.bot.get_channel(int(config['channel_id']))
         role = interaction.guild.get_role(int(config['role_id'])) if config.get('role_id') else None
