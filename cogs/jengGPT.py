@@ -6,7 +6,7 @@ import requests
 import time
 from json.decoder import JSONDecodeError
 
-OLLAMA_URL = "https://aims-injection-cruises-cliff.trycloudflare.com"
+OLLAMA_URL = "https://burlington-money-emotions-variance.trycloudflare.com"
 DEFAULT_MODEL = "mistral"
 
 # 🔍 Async check to verify Ollama is up before deferring
