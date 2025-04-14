@@ -8,11 +8,13 @@ import random
 # --- Console Colors ---
 RESET = "\033[0m"
 BOLD = "\033[1m"
-RED = "\033[91m"
-GREEN = "\033[92m"
-YELLOW = "\033[93m"
-BLUE = "\033[94m"
-CYAN = "\033[96m"
+DIM = "\033[2m"
+ITALIC = "\033[3m"
+UNDERLINE = "\033[4m"
+BLINK = "\033[5m"
+REVERSE = "\033[7m"
+HIDDEN = "\033[8m"
+RED = "\033[31m"
 
 # --- XP Settings ---
 XP_FILE = "xp_data.json"
